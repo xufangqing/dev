@@ -1,0 +1,173 @@
+#!/usr/bin/expect --
+#set xcmd [string trim $xcmd "\n"]
+#		set all_vars [info vars]
+#		puts "$all_vars"
+set xcmd      [lindex $argv 0]
+set xexpected [lindex $argv 1]
+set xtimeout  [lindex $argv 2]
+set xpid      [lindex $argv 3]
+set xcmd "ls"
+# set xexpected "root@nfoam.*# *$"
+set xexpected "dbs-HP-ProDesk-498-G3-MT-Business-PC:~\\$ "
+set xtimeout 10
+#set $xpid "exp6"
+
+puts {+++++++++++++++++++++++++++}
+puts "xcmd:      $xcmd"
+puts "xexpected: $xexpected"
+puts "xtimeout:  $xtimeout"
+puts "xpid:      $xpid"
+puts {+++++++++++++++++++++++++++}
+
+
+
+# set pid [spawn -noecho docker exec -it nfoam /bin/bash]
+set pid [spawn ssh dbs@10.9.131.142]
+set timeout $xtimeout
+puts {++++++++++++++=================+++++++++++++}
+puts "the current spawn_id is : $spawn_id, pid:$pid"
+if { "" == "$xpid" } {
+	set xpid $spawn_id
+} else {
+#	set spawn_id $xpid
+}
+puts "the used    spawn_id is : $xpid, pid:$pid"
+puts {++++++++++++++=================+++++++++++++}
+stty -echo
+expect {
+	-re "dbs-HP-ProDesk-498-G3-MT-Business-PC:~\\$ *$" {
+		set outbuf "$expect_out(buffer)"
+		puts "begin==========================================spawn docker exec -it nfoam /bin/bash>"
+		puts "$outbuf"
+		puts "<============================================end"
+	}
+	timeout {
+		puts "begin==========================================>"
+		puts "\[error\]: timeout for cmd\[spawn docker exec -it nfoam /bin/bash\]"
+		puts "<============================================end"
+		send -i $xpid -- "exit\n"
+		exit 254
+	}
+	eof {
+		puts "\n\[error\]: eof for cmd\[spawn docker exec -it nfoam /bin/bash\]\n"
+		set outbuf "$expect_out(buffer)"
+		puts "begin==========================================>"
+		puts "$outbuf"
+		puts "<============================================end"
+		send -i $xpid -- "exit\n"
+		exit 253
+	}
+}
+
+send "$xcmd\r"
+expect {
+	-re "$xexpected" {
+		puts "received the expect\[$xexpected\] for \[$xcmd\]"
+		set outbuf "$expect_out(buffer)"
+		puts "begin==========================================$xcmd>"
+		puts "$outbuf"
+		puts "<============================================end"
+	}
+	timeout {
+		puts "begin==========================================>"
+		puts "\[error\]: timeout for cmd\[$xcmd\]\n"
+		puts "<============================================end"
+		send -i $xpid -- "exit\n"
+		exit 254
+	}
+	eof {
+		puts "\n\[error\]: eof for cmd\[$xcmd\]\n"
+		set outbuf "$expect_out(buffer)"
+		puts "begin==========================================>"
+		puts "$outbuf"
+		puts "<============================================end"
+		send -i $xpid -- "exit\n"
+		exit 253
+	}
+}
+
+set timeout 10
+# set timeout $xtimeout
+set xcmd "/bin/sysrepoctl.sh -l"
+set xexpected "ManagedElement.*Equipment.*TransportNetwork.*root@nfoam.*# *$"
+set xcmd "pwd"
+set xexpected "dbs-HP-ProDesk-498-G3-MT-Business-PC:~\\$ "
+send "$xcmd\n"
+expect {
+	-re "$xexpected" {
+		puts "received the expect\[$xexpected\] for \[$xcmd\]"
+		set outbuf "$expect_out(buffer)"
+		puts "begin==========================================$xcmd>"
+		puts "$outbuf"
+		puts "<============================================end"
+	}
+	-re ".*root@nfoam.*# *$" {
+		exp_continue
+	}
+	timeout {
+		puts "begin==========================================>"
+		puts "\[error\]: timeout for cmd\[$xcmd\]\n"
+		puts "<============================================end"
+		send -i $xpid -- "exit\n"
+		exit 254
+	}
+	eof {
+		puts "\n\[error\]: eof for cmd\[$xcmd\]\n"
+		set outbuf "$expect_out(buffer)"
+		puts "begin==========================================>"
+		puts "$outbuf"
+		puts "<============================================end"
+		send -i $xpid -- "exit\n"
+		exit 253
+	}
+}
+
+
+
+
+send "exit\r"
+send "who\r"
+expect {
+	-re "wind" {
+		set outbuf "$expect_out(buffer)"
+		puts "begin==========================================$xcmd>"
+		puts "$outbuf"
+		puts "<============================================end"
+	}
+	eof {
+		puts "\n\[error\]: eof for cmd\[who\]\n"
+		set outbuf "$expect_out(buffer)"
+		puts "begin==========================================>"
+		puts "$outbuf"
+		puts "<============================================end"
+	}
+}
+
+send "who\r"
+expect {
+	-re "wind" {
+		set outbuf "$expect_out(buffer)"
+		puts "begin==========================================$xcmd>"
+		puts "$outbuf"
+		puts "<============================================end"
+	}
+	eof {
+		puts "\n\[error\]: eof for cmd\[who\]\n"
+		set outbuf "$expect_out(buffer)"
+		puts "begin==========================================>"
+		puts "$outbuf"
+		puts "<============================================end"
+	}
+}
+# send -i $xpid -- "exit\r"
+# close
+
+
+# send -i $xpid -- "exit\n"
+puts "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+#send -i $xpid -- "exit\n"
+
+puts "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
+# interact -i
+puts "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"
+#

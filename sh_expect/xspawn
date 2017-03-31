@@ -1,0 +1,55 @@
+#!/usr/bin/expect --
+
+
+set xcmd      [lindex $argv 0]
+set xpid      [lindex $argv 1]
+puts {+++++++++++++++++++++++++++}
+puts "xcmd:      $xcmd"
+puts "xpid:      $xpid"
+puts {+++++++++++++++++++++++++++}
+
+
+#spawn $xcmd
+spawn docker exec -it nfoam /bin/bash
+#set pid [spawn "$xcmd"]
+
+#if { 0 == $pid } {
+#	puts "\[error\]: failed to spawn $xcmd" 
+#	exit 210
+#}
+#puts {++++++++++++++=================+++++++++++++}
+#puts "the spawn_id is : $spawn_id"
+#puts {++++++++++++++=================+++++++++++++}
+set xpid $spawn_id
+
+
+
+
+set spawn_id $xpid
+send -i $xpid -- "ls /bin/sysrepoctl.sh\n"
+expect {
+	-i $xpid -re ".*root@nfoam.*# *$" {
+		puts "received the expect"
+		set outbuf "$expect_out(buffer)"
+		puts "begin==========================================$xcmd>"
+		puts "$outbuf"
+		puts "<============================================end"
+	}
+	timeout {
+		puts "\[error\]: timeout"
+		puts "begin==========================================>"
+		puts "\[error\]: timeout"
+		puts "<============================================end"
+	}
+	eof {
+		puts "\n\[error\]: eof"
+		set outbuf "$expect_out(buffer)"
+		puts "begin==========================================>"
+		puts "$outbuf"
+		puts "<============================================end"
+	}
+}
+
+send_user "spawnpid:$xpid"
+
+

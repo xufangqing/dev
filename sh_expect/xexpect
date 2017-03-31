@@ -1,0 +1,74 @@
+#!/usr/bin/expect --
+
+set xcmd      [lindex $argv 0]
+set xexpected [lindex $argv 1]
+set xtimeout  [lindex $argv 2]
+set xpid      [lindex $argv 3]
+puts {+++++++++++++++++++++++++++}
+puts "xcmd:      $xcmd"
+puts "xexpected: $xexpected"
+puts "xtimeout:  $xtimeout"
+puts "xpid:      $xpid"
+puts {+++++++++++++++++++++++++++}
+# puts $spawn_id
+
+#set xcmd "ls"
+#set xexpected "root@nfoam.*# *$"
+#set xtimeout 5
+#set $xpid "exp6"
+
+# spawn docker exec -it nfoam /bin/bash
+set timeout $xtimeout
+set spawn_id $xpid
+puts {++++++++++++++=================+++++++++++++}
+puts "the current spawn_id is : $spawn_id"
+if { "" == "$xpid" } {
+#	set xpid $spawn_id
+	set xpid "exp6"
+} else {
+}
+puts "the used    spawn_id is : $xpid"
+puts {++++++++++++++=================+++++++++++++}
+
+
+send -i $xpid -- "$xcmd\n"
+#set xcmd [string trim $xcmd "\n"]
+expect {
+	-i $xpid -re "var.*root@nfoam.*# *$" {
+		puts "received the expect\[$xexpected\]"
+#		set all_vars [info vars]
+#		puts "$all_vars"
+		set outbuf "$expect_out(buffer)"
+
+		
+		puts "begin==========================================$xcmd>"
+		puts "$outbuf"
+		puts "<============================================end"
+	}
+	timeout {
+		puts "\[error\]: timeout for cmd\[$xcmd\]\n"
+		puts "begin==========================================>"
+		puts "\[error\]: timeout for cmd\[$xcmd\]\n"
+		puts "<============================================end"
+#		exit 254
+	}
+	eof {
+		puts "\n\[error\]: eof for cmd\[$xcmd\]\n"
+		set outbuf "$expect_out(buffer)"
+		puts "begin==========================================>"
+		puts "$outbuf"
+		puts "<============================================end"
+#		exit 253
+	}
+}
+
+
+
+# send -i $xpid -- "exit\n"
+puts "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
+#send -i $xpid -- "exit\n"
+#close -i $xpid
+puts "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS"
+# interact -i
+puts "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"
+#

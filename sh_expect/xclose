@@ -1,0 +1,36 @@
+#!/usr/bin/expect --
+
+set xpid      [lindex $argv 0]
+puts {+++++++++++++++++++++++++++}
+puts "xpid:      $xpid"
+puts {+++++++++++++++++++++++++++}
+set spawn_id $xpid
+send -i $xpid -- "ls /bin/sysrepoctl.sh\n"
+expect {
+	-i $xpid -re ".*root@nfoam.*# *$" {
+		puts "received the expect\[$xexpected\]"
+		set outbuf "$expect_out(buffer)"
+		puts "begin==========================================$xcmd>"
+		puts "$outbuf"
+		puts "<============================================end"
+	}
+	timeout {
+		puts "\[error\]: timeout for cmd\[$xcmd\]\n"
+		puts "begin==========================================>"
+		puts "\[error\]: timeout for cmd\[$xcmd\]\n"
+		puts "<============================================end"
+	}
+	eof {
+		puts "\n\[error\]: eof for cmd\[$xcmd\]\n"
+		set outbuf "$expect_out(buffer)"
+		puts "begin==========================================>"
+		puts "$outbuf"
+		puts "<============================================end"
+	}
+}
+puts "6666666666666666666exit66666"
+send -i $xpid -- "exit\n"
+puts "777777777777777close77777777"
+close -i $xpid
+
+
